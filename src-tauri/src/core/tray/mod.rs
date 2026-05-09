@@ -38,6 +38,8 @@ mod proxy_speed;
 #[cfg(target_os = "macos")]
 mod speed_task;
 use menu_def::{MenuIds, MenuTexts};
+#[cfg(target_os = "macos")]
+use proxy_menu::TrayDelayState;
 
 // TODO: 是否需要将可变菜单抽离存储起来，后续直接更新对应菜单实例，无需重新创建菜单(待考虑)
 
@@ -404,6 +406,13 @@ impl Tray {
     #[cfg(target_os = "macos")]
     pub fn update_speed_task(&self, enable_tray_speed: bool) {
         self.speed_controller.update_task(enable_tray_speed);
+    }
+
+    /// macOS 下原位刷新代理组测速状态，避免测速过程中重建菜单导致菜单收起。
+    #[cfg(target_os = "macos")]
+    pub fn refresh_proxy_group_latency_menu(&self, group: &str, states: HashMap<std::string::String, TrayDelayState>) {
+        let app_handle = handle::Handle::app_handle();
+        proxy_menu_style::TrayProxyMenuStyler::refresh_group(app_handle, group, states);
     }
 }
 
@@ -903,7 +912,7 @@ fn on_menu_event(_: &AppHandle, event: MenuEvent) {
                             feat::switch_proxy_node(&group, &proxy).await;
                         }
                         TrayProxyMenuAction::TestGroupDelay { group } => {
-                            TrayProxyLatencyController::global().test_group_delay(group).await;
+                            TrayProxyLatencyController::spawn_group_delay_test(group);
                         }
                     }
                 } else {

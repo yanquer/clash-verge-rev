@@ -5,9 +5,11 @@
 
 use crate::config::Config;
 use crate::core::{handle, tray::Tray};
+use crate::process::AsyncHandler;
 use crate::{Type, logging};
 use anyhow::Result;
 use clash_verge_i18n::t;
+#[cfg(not(target_os = "macos"))]
 use clash_verge_logging::logging_error;
 use futures::stream::{self, StreamExt as _};
 use parking_lot::Mutex;
@@ -233,6 +235,13 @@ impl TrayProxyLatencyController {
         }
     }
 
+    /// 在后台启动代理组延迟测试，避免菜单事件等待测速任务完成。
+    pub fn spawn_group_delay_test(group: String) {
+        AsyncHandler::spawn(move || async move {
+            Self::global().test_group_delay(group).await;
+        });
+    }
+
     /// 标记代理组测速状态，防止重复点击并发触发同一组测速。
     fn begin_group_test(&self, group: &str) -> bool {
         self.testing_groups.lock().insert(group.to_string())
@@ -246,9 +255,10 @@ impl TrayProxyLatencyController {
             return Ok(());
         }
 
-        self.mark_group_testing(&group, &names);
+        let menu_names = names.clone();
+        self.mark_group_testing(&group, &menu_names);
         logging!(info, Type::Tray, "托盘代理组测速开始: {group}, 节点数: {}", names.len());
-        logging_error!(Type::Tray, Tray::global().update_menu().await);
+        self.refresh_group_menu(&group, &menu_names);
 
         let mut pending = stream::iter(names)
             .map(|name| {
@@ -264,11 +274,27 @@ impl TrayProxyLatencyController {
         while let Some((group, name, state)) = pending.next().await {
             self.set_state(&group, &name, state);
             logging!(debug, Type::Tray, "托盘代理节点测速完成: {group}/{name}, {state:?}");
-            logging_error!(Type::Tray, Tray::global().update_menu().await);
+            self.refresh_group_menu(&group, &menu_names);
         }
 
         logging!(info, Type::Tray, "托盘代理组测速完成: {group}");
         Ok(())
+    }
+
+    /// 刷新当前代理组的菜单延迟状态，macOS 下原位更新菜单项以避免收起菜单。
+    fn refresh_group_menu(&self, group: &str, names: &[String]) {
+        #[cfg(target_os = "macos")]
+        {
+            Tray::global().refresh_proxy_group_latency_menu(group, self.group_state_snapshot(group, names));
+        }
+
+        #[cfg(not(target_os = "macos"))]
+        {
+            let _ = (group, names);
+            AsyncHandler::spawn(|| async move {
+                logging_error!(Type::Tray, Tray::global().update_menu().await);
+            });
+        }
     }
 
     /// 收集代理组测速所需的节点列表、测速 URL 和超时时间。
@@ -323,6 +349,19 @@ impl TrayProxyLatencyController {
     /// 写入单个节点的测速状态。
     fn set_state(&self, group: &str, name: &str, state: TrayDelayState) {
         self.cache.lock().insert(Self::cache_key(group, name), state);
+    }
+
+    /// 生成指定代理组的延迟状态快照，供原生菜单原位刷新使用。
+    fn group_state_snapshot(&self, group: &str, names: &[String]) -> HashMap<String, TrayDelayState> {
+        let cache = self.cache.lock();
+        names
+            .iter()
+            .filter_map(|name| {
+                cache
+                    .get(&Self::cache_key(group, name))
+                    .map(|state| (name.clone(), *state))
+            })
+            .collect()
     }
 
     /// 生成延迟缓存键。
