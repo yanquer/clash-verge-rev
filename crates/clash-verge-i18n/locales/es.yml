@@ -48,6 +48,11 @@ tray:
   systemProxy: Proxy del sistema
   tunMode: Modo TUN
   closeAllConnections: Cerrar todas las conexiones
+  delayTest: Prueba de latencia
+  delayStatus:
+    testing: Probando
+    timeout: Tiempo agotado
+    error: Error
   lightweightMode: Modo ligero
   copyEnv: Copiar variables de entorno
   confDir: Directorio de configuración

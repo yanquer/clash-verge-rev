@@ -48,6 +48,11 @@ tray:
   systemProxy: وكيل النظام
   tunMode: وضع TUN
   closeAllConnections: إغلاق كل الاتصالات
+  delayTest: اختبار التأخير
+  delayStatus:
+    testing: جار الاختبار
+    timeout: Timeout
+    error: Error
   lightweightMode: الوضع الخفيف
   copyEnv: نسخ متغيرات البيئة
   confDir: دليل الإعدادات

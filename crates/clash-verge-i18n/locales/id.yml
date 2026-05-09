@@ -48,6 +48,11 @@ tray:
   systemProxy: Proksi Sistem
   tunMode: Mode TUN
   closeAllConnections: Tutup Semua Koneksi
+  delayTest: Uji Latensi
+  delayStatus:
+    testing: Menguji
+    timeout: Timeout
+    error: Error
   lightweightMode: Mode Ringan
   copyEnv: Salin Variabel Lingkungan
   confDir: Direktori Konfigurasi

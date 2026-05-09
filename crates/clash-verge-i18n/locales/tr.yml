@@ -48,6 +48,11 @@ tray:
   systemProxy: Sistem Vekil'i
   tunMode: TUN Modu
   closeAllConnections: Tüm Bağlantıları Kapat
+  delayTest: Gecikme Testi
+  delayStatus:
+    testing: Test ediliyor
+    timeout: Zaman aşımı
+    error: Hata
   lightweightMode: Hafif Mod
   copyEnv: Ortam Değişkenlerini Kopyala
   confDir: Yapılandırma Dizini

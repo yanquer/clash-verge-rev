@@ -48,6 +48,11 @@ tray:
   systemProxy: 시스템 프록시
   tunMode: TUN 모드
   closeAllConnections: 모든 연결 닫기
+  delayTest: 지연 테스트
+  delayStatus:
+    testing: 테스트 중
+    timeout: 시간 초과
+    error: 오류
   lightweightMode: 경량 모드
   copyEnv: 환경 변수 복사
   confDir: 구성 디렉터리

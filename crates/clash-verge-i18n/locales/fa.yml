@@ -48,6 +48,11 @@ tray:
   systemProxy: پروکسی سیستم
   tunMode: حالت TUN
   closeAllConnections: بستن همه اتصال‌ها
+  delayTest: تست تأخیر
+  delayStatus:
+    testing: در حال تست
+    timeout: Timeout
+    error: Error
   lightweightMode: حالت سبک
   copyEnv: کپی متغیرهای محیطی
   confDir: پوشه پیکربندی

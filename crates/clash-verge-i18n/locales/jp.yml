@@ -48,6 +48,11 @@ tray:
   systemProxy: システムプロキシ
   tunMode: TUN モード
   closeAllConnections: すべての接続を閉じる
+  delayTest: 遅延テスト
+  delayStatus:
+    testing: テスト中
+    timeout: Timeout
+    error: Error
   lightweightMode: 軽量モード
   copyEnv: 環境変数をコピー
   confDir: 設定ディレクトリ

@@ -48,6 +48,11 @@ tray:
   systemProxy: Системалы прокси
   tunMode: TUN режимы
   closeAllConnections: Барлык тоташуларны ябу
+  delayTest: Delay Test
+  delayStatus:
+    testing: Testing
+    timeout: Timeout
+    error: Error
   lightweightMode: Җиңел режим
   copyEnv: Мохит үзгәрүчәннәрен күчерү
   confDir: Конфигурация каталогы
